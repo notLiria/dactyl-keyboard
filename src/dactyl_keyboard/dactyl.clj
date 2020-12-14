@@ -14,28 +14,28 @@
 ;;;;;;;;;;;;;;;;;;;;;;
 
 (def nrows 4)
-(def ncols 5)
+(def ncols 6)
 
-(def α (/ π 12))                        ; curvature of the columns
+(def α (/ π 6))                        ; curvature of the columns
 (def β (/ π 36))                        ; curvature of the rows
 (def centerrow (- nrows 3))             ; controls front-back tilt
 (def centercol 3)                       ; controls left-right tilt / tenting (higher number is more tenting)
-(def tenting-angle (/ π 12))            ; or, change this for more precise tenting control
+(def tenting-angle (/ π 3))            ; or, change this for more precise tenting control
 (def column-style 
-  (if (> nrows 5) :orthographic :standard))  ; options include :standard, :orthographic, and :fixed
+  (if (> nrows 5) :orthographic))  ; options include :standard, :orthographic, and :fixed
 ; (def column-style :fixed)
 
 (defn column-offset [column] (cond
-  (= column 2) [0 2.82 -4.5]
+  (= column 2) [0 2.82 0]
   (>= column 4) [0 -12 5.64]            ; original [0 -5.8 5.64]
   :else [0 0 0]))
 
 (def thumb-offsets [6 -3 7])
 
-(def keyboard-z-offset 9)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
+(def keyboard-z-offset 40)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
-(def extra-width 2.5)                   ; extra space between the base of keys; original= 2
-(def extra-height 1.0)                  ; original= 0.5
+(def extra-width 2)                   ; extra space between the base of keys; original= 2
+(def extra-height 1)                  ; original= 0.5
 
 (def wall-z-offset -15)                 ; length of the first downward-sloping part of the wall (negative)
 (def wall-xy-offset 5)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
@@ -216,8 +216,7 @@
   (apply union
          (for [column columns
                row rows
-               :when (or (.contains [2 3] column)
-                         (not= row lastrow))]
+               :when (not= row lastrow)]
            (->> single-plate
                 (key-place column row)))))
 
@@ -225,8 +224,7 @@
   (apply union
          (for [column columns
                row rows
-               :when (or (.contains [2 3] column)
-                         (not= row lastrow))]
+               :when (not= row lastrow)]
            (->> (sa-cap (if (= column 5) 1 1))
                 (key-place column row)))))
 
@@ -741,6 +739,16 @@
                     ;             rj9-space 
                                 ; wire-posts
                   )))
+(spit "things/right-main-switch-test.scad"
+      (write-scad
+       (union key-holes
+              connectors
+              caps)))
+(spit "things/right-thumb-switch-test.scad"
+      (write-scad
+       (union thumb
+              thumb-connectors
+              thumbcaps)))
 
 (spit "things/right-plate.scad"
       (write-scad 
